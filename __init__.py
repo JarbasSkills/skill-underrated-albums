@@ -19,12 +19,14 @@ class UnderratedAlbumsSkill(OVOSCommonPlaybackSkill):
         self.n_mixes = 5
 
     def initialize(self):
-        url = "https://www.youtube.com/channel/UCaNd66xUJjX8VZT6AByVpiw"
         bootstrap = "https://github.com/JarbasSkills/skill-underrated-albums/raw/dev/bootstrap.json"
         self.archive.bootstrap_from_url(bootstrap)
-        self.archive.monitor(url)
-        self.archive.setDaemon(True)
-        self.archive.start()
+        self.schedule_event(self._sync_db, random.randint(3600, 24 * 3600))
+
+    def _sync_db(self):
+        url = "https://www.youtube.com/channel/UCaNd66xUJjX8VZT6AByVpiw"
+        self.archive.parse_videos(url)
+        self.schedule_event(self._sync_db, random.randint(3600, 24*3600))
 
     def match_skill(self, phrase, media_type):
         score = 0
